@@ -29,6 +29,7 @@ void updateFle(int degree, float seno, float cos, int isApproximated){
     // Adiciona os dados no arquivo
     else {
         float radian = convertDeegreToRad(degree);
+        fprintf(file, "%d - %f - %f - %f\n", degree, radian, seno, cos);
     }
 
     fclose(file);
@@ -59,7 +60,7 @@ void checkTrigo(float targetSeno){
             // So escrever no arquivo
             printf("%f | %f | %f\n", seno, targetSeno, seno);
             printf("Iguais!\n");
-            updateFle(degree, seno, cos);
+            updateFle(degree, seno, cos, 0);
         }
 
         else if((lastSeno < targetSeno) && (targetSeno < seno)) {
@@ -67,12 +68,12 @@ void checkTrigo(float targetSeno){
             
             if(checkDiference(lastSeno, targetSeno, seno)) {
                 printf("Mais proximo eh : %f\n", seno);
-                updateFle(degree, seno, cos);
+                updateFle(degree, seno, cos, 1);
             } 
             
             else {
                 printf("Mais proximo eh : %f\n", lastSeno);
-                updateFle(lastDegree, lastSeno, lastCos);
+                updateFle(lastDegree, lastSeno, lastCos, 1);
             }
             
 

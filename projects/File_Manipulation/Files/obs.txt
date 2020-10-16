@@ -1,0 +1,37 @@
+O valores no arquvio "trigo.txt" consistem em:
+
+- Angulo (Graus)
+- Seno
+- Cosseno
+
+Ex:
+
+0
+0.000000
+1.000000
+1
+0.017452
+0.999391
+.
+.
+.
+
+
+Arquvio de output
+
+Graus - Radianos - Seno - Cosseno
+45 - 0,785398 - 0.707106 - 0.707106
+50 - 0,872665 - 0.766044 - 0.642787 
+
+Graus - Radianos - Seno - Cosseno
+
+45
+0,785398
+0.707106
+0.707106
+---
+50
+0,872665
+0.766044
+0.642787
+---

@@ -13,8 +13,8 @@ int checkDiference(float bottom, float target, float superior){
     int bottomDifference = target - bottom;
     int superiorDifference = target - superior;
 
-    if(bottomDifference < superiorDifference) return bottomDifference;
-    else return superiorDifference;
+    if(bottomDifference < superiorDifference) return -1;
+    else return 1;
 }
 
 // Adiciona dados ao arquivo

@@ -10,8 +10,8 @@ float convertDeegreToRad(int degree){
 // Retornar -1 se for mais proximo de @bottom e 1 se for mais proximo de @superior
 int checkDiference(float bottom, float target, float superior){
 
-    int bottomDifference = target - bottom;
-    int superiorDifference = target - superior;
+    float bottomDifference = fabs(target - bottom);
+    float superiorDifference = fabs(target - superior);
 
     if(bottomDifference < superiorDifference) return -1;
     else return 1;
@@ -30,6 +30,7 @@ void updateFle(int degree, float seno, float cos, int isApproximated){
     else {
         float radian = convertDeegreToRad(degree);
         fprintf(file, "%d - %f - %f - %f\n", degree, radian, seno, cos);
+        printf("%d - %f - %f - %f\n", degree, radian, seno, cos);
     }
 
     fclose(file);
@@ -56,23 +57,16 @@ void checkTrigo(float targetSeno){
         readFlag = fscanf(file, "%d\n%f\n%f\n", &degree, &seno, &cos);
 
         if(targetSeno == seno) {
-            // Caso seja identico
-            // So escrever no arquivo
-            printf("%f | %f | %f\n", seno, targetSeno, seno);
-            printf("Iguais!\n");
             updateFle(degree, seno, cos, 0);
         }
 
         else if((lastSeno < targetSeno) && (targetSeno < seno)) {
-            printf("%f | %f | %f\n", lastSeno, targetSeno, seno);
             
-            if(checkDiference(lastSeno, targetSeno, seno)) {
-                printf("Mais proximo eh : %f\n", seno);
+            if(checkDiference(lastSeno, targetSeno, seno) == 1) {
                 updateFle(degree, seno, cos, 1);
             } 
             
             else {
-                printf("Mais proximo eh : %f\n", lastSeno);
                 updateFle(lastDegree, lastSeno, lastCos, 1);
             }
             

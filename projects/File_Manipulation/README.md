@@ -21,3 +21,16 @@ E para executar
 ```
 ./main
 ```
+
+## **3. Estrutura do resultada:**
+O resultado obtido pelo programa é retornado da seguinte forma:
+```
+Graus - Radianos - Seno - Cosseno  
+grau1 - rad1 - sin1 - cos1
+grau2 - rad2 - sin2 - cos2
+
+.
+.
+.
+
+```

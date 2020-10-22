@@ -7,19 +7,25 @@ float convertDeegreToRad(int degree){
     return degree * ( M_PI / 180.0 ); 
 }
 
-// Retornar -1 se for mais proximo de @bottom e 1 se for mais proximo de @superior
-int checkDiference(float bottom, float target, float superior){
+// Procura a aproximação do grau com regra de 3
+float findDegree(float fixedDegree, float fixedSin, float findSin){
+    
+    return (fixedDegree * findSin) / fixedSin;
 
-    float bottomDifference = fabs(target - bottom);
-    float superiorDifference = fabs(target - superior);
+}
 
-    if(bottomDifference < superiorDifference) return -1;
-    else return 1;
+// Procura aproximação de Cosseno para grau nao inteiro
+float findCos(float findSin){
+
+    float findCos = sqrt(1 - pow(findSin, 2));
+    return findCos;
+
 }
 
 // Adiciona dados ao arquivo
-void updateFle(int degree, float seno, float cos, int isApproximated){
+void updateFle(float degree, float seno, float cos, int isApproximated){
     FILE * file = fopen("./Files/senocosseno.txt", "a+");
+    char endline[50] = "\n";
 
     // Verifica abertura do arquivo
     if(file == NULL) {
@@ -29,8 +35,8 @@ void updateFle(int degree, float seno, float cos, int isApproximated){
     // Adiciona os dados no arquivo
     else {
         float radian = convertDeegreToRad(degree);
-        fprintf(file, "%d - %f - %f - %f\n", degree, radian, seno, cos);
-        printf("%d - %f - %f - %f\n", degree, radian, seno, cos);
+        fprintf(file, "%f - %f - %f - %f\n", degree, radian, seno, cos);
+        printf("%f - %f - %f - %f\n", degree, radian, seno, cos);
     }
 
     fclose(file);
@@ -41,7 +47,8 @@ void checkTrigo(float targetSeno){
 
     // Variavies
     FILE * file;
-    int readFlag = 1, degree = 0, lastDegree = 0;
+    int readFlag = 1;
+    float degree = 0, lastDegree = 0;
     float seno = 0, cos = 0, lastSeno = 0, lastCos = 0;
 
     file = fopen("./Files/trigo.txt", "r");
@@ -54,7 +61,7 @@ void checkTrigo(float targetSeno){
 
         lastSeno = seno; lastCos = cos; lastDegree = degree;
 
-        readFlag = fscanf(file, "%d\n%f\n%f\n", &degree, &seno, &cos);
+        readFlag = fscanf(file, "%f\n%f\n%f\n", &degree, &seno, &cos);
 
         if(targetSeno == seno) {
             updateFle(degree, seno, cos, 0);
@@ -62,19 +69,13 @@ void checkTrigo(float targetSeno){
 
         else if((lastSeno < targetSeno) && (targetSeno < seno)) {
             
-            if(checkDiference(lastSeno, targetSeno, seno) == 1) {
-                updateFle(degree, seno, cos, 1);
-            } 
-            
-            else {
-                updateFle(lastDegree, lastSeno, lastCos, 1);
-            }
-            
+            float finalDdegree = findDegree(lastDegree, lastSeno, targetSeno);
+            float finalCos = findCos(targetSeno);
+            updateFle(finalDdegree, targetSeno, finalCos, 1);
 
             break;
         }
 
-        
 
     }
 
@@ -82,6 +83,7 @@ void checkTrigo(float targetSeno){
 
 }
 
+// Função principal
 int main(int argc, char const *argv[]) {
 
     FILE * file;

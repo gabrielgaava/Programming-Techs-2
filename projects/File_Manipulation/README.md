@@ -6,7 +6,7 @@
 ## **1. Sobre o projeto:**
 O enunciado deste projeto consta em ```Statement.md```
 
-Todos os arquviso se encontram dentro da pasta ```Files```. O resultado final gerado pelo programa é salvo no arquivo ```senocosseno.txt```. Uma copia do resultado obtido por min, na ultima execução, está salvo em ```resultados.txt```
+Todos os arquivos se encontram dentro da pasta ```Files```. O resultado final gerado pelo programa é salvo no arquivo ```senocosseno.txt```. Uma copia do resultado obtido por min, na ultima execução, está salvo em ```resultados.txt```
 
 A aproximação de graus e do cosseno são feitos sempre em relação ao grau inferior. Por exemplo, se eu sei que o seno de leitura atual está no intervalo entre 25 graus e 26 graus, farei a regra de três utilizando 25 graus.
 

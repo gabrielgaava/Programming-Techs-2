@@ -2,7 +2,6 @@
 #include <stdlib.h>
 
 // Leita N números e calcule a média e quantos números estão acima da média
-
 int main(int argc, char const *argv[])
 {   
 
@@ -35,9 +34,9 @@ int main(int argc, char const *argv[])
     printf("\nMedia: %.2f", media);
     printf("\nQuantidade acima: %d\n", count);
 
-
     return 0;
 }
+
 
 
 

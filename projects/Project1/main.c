@@ -36,7 +36,7 @@ void updateFle(float degree, float seno, float cos, int isApproximated){
     else {
         float radian = convertDeegreToRad(degree);
         fprintf(file, "%f - %f - %f - %f\n", degree, radian, seno, cos);
-        printf("%f - %f - %f - %f\n", degree, radian, seno, cos);
+        //printf("%f - %f - %f - %f\n", degree, radian, seno, cos);
     }
 
     fclose(file);
@@ -86,17 +86,26 @@ void checkTrigo(float targetSeno){
 // Função principal
 int main(int argc, char const *argv[]) {
 
-    FILE * file;
+    FILE * file, * file2;
     int readFlag = 1;
     float readSeno;
 
     file = fopen("./Files/seno.txt", "r");
 
+    // Inicializando arquivo de saida
+    file2 = fopen("./Files/senocosseno.txt", "w");
+    fprintf(file2, "Graus - Radianos - Seno - Cosseno\n");
+    fclose(file2);
+
+    // Loop de leitura do arquivo seno.txt
     while(fscanf(file, "%f\n", &readSeno) != EOF){
 
         checkTrigo(readSeno);
 
     }
+
+    printf("> Leitura do arquivo seno.txt finalizada! \n");
+    printf("> Resultados obtidos armazenados em (Files/senocosseno.txt) \n");
 
 
     fclose(file);

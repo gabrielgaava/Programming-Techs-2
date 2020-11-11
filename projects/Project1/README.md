@@ -22,7 +22,7 @@ E para executar
 ./main
 ```
 
-## **3. Estrutura do resultada:**
+## **3. Estrutura do resultado:**
 O resultado obtido pelo programa é retornado da seguinte forma:
 ```
 Graus - Radianos - Seno - Cosseno  

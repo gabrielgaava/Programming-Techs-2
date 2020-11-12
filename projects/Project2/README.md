@@ -15,11 +15,14 @@ Saída para este caso de teste
 Ponto (2.4, 3.7)
 ```
 
+Equação para o calculo da massa dos pontos
 M = m1 + m2 + m3 = 3
 
+Cordenada X do Centro de Massa
 Xcm = 1/M * (4.5) + (0) + (2.4) 
 Xcm = 1/3 * (6.9) = 2.3
 
+Cordenada Y do Centro de Massa
 Ycm = 1/M * (6.3) + (0) + (3.7)
 Ycm = 1/3 * (10) = 3.33
 

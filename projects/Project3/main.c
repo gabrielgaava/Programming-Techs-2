@@ -5,9 +5,10 @@
 // Global Values
 int boardSize = 0;
 int solutionsCount = 0;
-int* board;
+int * board;
 FILE * tempFile;
 
+// Crete de output file "rainha.out"
 void createOutputFile(){
 
     // READ BUFFER
@@ -44,7 +45,8 @@ void initBoard(){
     }
 }
 
-/* Print the actual state of the board in terminal */
+// Print the actual state of the board
+// in terminal and/or file 
 void printSolution(){
     solutionsCount++;
     //printf("\nSolution %d: \n", solutionsCount);

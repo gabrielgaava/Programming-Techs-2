@@ -56,7 +56,7 @@ int main(int argc, char const *argv[])
     fscanf(inputFile, "%d\n", &entrySize);
 
     // Alocating memory space
-    point pointsList[entrySize];
+    point pointsList[entrySize]; // USE MALLOC
     point readPoint;
     readPoint.mass = 1;
 

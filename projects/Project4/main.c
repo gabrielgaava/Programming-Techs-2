@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define BUFFER_SIZE 40
+#define TRUE 1
+#define FALSE 0
+
 
 // Estrutura de Dados
 typedef struct no {
@@ -10,9 +14,13 @@ typedef struct no {
      struct no *prox; 
 } Elem;
 
+int bufferCount = 0;
+FILE * outputFile, * inputFile;
+Elem * Buffer;
+
 
 // Cria uma lista circular com "n" posições. Sendo size = n
-Elem * createCircularList(int size){
+Elem * createRingBuffer(int size){
 
     // Ponteiros auxiliares
     Elem * prevNode, * newNode;
@@ -55,80 +63,119 @@ Elem * createCircularList(int size){
 }
 
 
-// Le todos os nós da lista e conta
-void readList(Elem * beginning){
+// Le, printa e conta todos os nós da lista
+void readList(Elem * ringBuffer){
 
     Elem * currentNode = NULL;
     int listSize = 0;
 
-    if(beginning == NULL) printf("\nLista vazia!");
+    if(ringBuffer == NULL) printf("\nLista vazia!");
 
     else {
 
-        currentNode = beginning;
+        currentNode = ringBuffer;
 
         do {
             printf("[%s %d] --> ", currentNode->pal, currentNode->urg);
             listSize++;
             currentNode = currentNode->prox;
 
-        } while(currentNode != beginning);
+        } while(currentNode != ringBuffer);
         
     }
 
+    puts("");
     printf("\n> [%d] Elementos percorridos\n", listSize);
 
 }
 
 
-// Insere um registro na lista circular
-// 1. Procura uma posição livre
-// 2. Faz as atribuições
-void insertData(char word[20], int urg, Elem * list){
+// Insere um registro no Buffer
+Elem * insertData(char word[20], int urg, Elem * writePointer){
 
-    Elem * currentNode = list;
     int wasFound = 0;
 
-    do {
+    // Buffer está Lotado 40/40
+    if(bufferCount == BUFFER_SIZE) printf("> Buffer lotado \n");
 
-        // Posição livre
-        if(strcmp(currentNode->pal, "\0") == 0){
+    else {
 
-            strcpy(currentNode->pal, word);
-            currentNode->urg = urg;
-            wasFound = 1;
+        strcpy(writePointer->pal, word);
+        writePointer->urg = urg;
+        writePointer = writePointer->prox;
+        bufferCount++;
 
-        } else {
+    }
 
-            currentNode = currentNode->prox;
-
-        }
-
-    } while(currentNode != list && !wasFound);
+    return writePointer;
     
 }
 
 
-// Le o arquivo "pacotes.dat" 
-void readFile(Elem * list){
+// Remove um registro do Buffer
+Elem * deleteData(Elem * readPointer, Elem * writePointer){
+    
+    // Escreve no arquivo
+    fprintf(outputFile, "%s\n", readPointer->pal);
 
-    FILE * file = fopen("pacotes.dat", "r");
+    // Caso a palavra removida seja PRTY 
+    if(strcmp(readPointer->pal, "PRTY") == 0) {
+
+        // Limpa o valor
+        strcpy(readPointer->pal, "\0");
+        int jumpValue = readPointer->urg;
+
+        for(int i = 0; i < jumpValue; i++){
+            readPointer = readPointer->prox;
+
+            // Caso tenha chegado ao ultimo valor inserido
+            if(readPointer->prox == writePointer) {
+                i = jumpValue;
+            }
+        }
+        
+    } else {
+        
+        strcpy(readPointer->pal, "\0");
+        readPointer->urg = -1;
+        readPointer = readPointer->prox;
+
+    }
+
+    bufferCount--;
+    return readPointer;
+}
+
+// Le o arquivo "pacotes.dat" 
+void readFile(Elem * ringBuffer){
+
+    Elem * writePointer = ringBuffer;
+    Elem * readPointer = ringBuffer;
+
+    
     int fileEntries = 0;
 
     // Valores de entrada do arquivo
     int intA, intB; char string[20];
 
     // Leitura até o fim do arquivo
-    while(fscanf(file, "%d %s %d\n", &intA, string, &intB) == 3){
+    while(fscanf(inputFile, "%d %s %d\n", &intA, string, &intB) == 3){
 
         if(intA == 0) {
-            insertData(string, intB, list);
+            writePointer = insertData(string, intB, writePointer);
             fileEntries++;
+        }
+
+        else if (intA == 1){
+            readPointer = deleteData(readPointer, writePointer);
         }
 
     }
 
+    puts("");
     printf("> %d Entradas lidas \n", fileEntries);
+    printf("> %d Elementos no Buffer\n", bufferCount);
+    puts("");
 
 }
 
@@ -137,9 +184,15 @@ void readFile(Elem * list){
 int main(int argc, char const *argv[])
 {
 
-    Elem * bufferList = createCircularList(40);
-    readFile(bufferList);
-    readList(bufferList);
+    Buffer = createRingBuffer(BUFFER_SIZE);
+
+    // Arquivos que serão utilizados
+    outputFile = fopen("lidos.dat", "w+");
+    inputFile = fopen("pacotes.dat", "r");
+
+    readFile(Buffer);
+    readList(Buffer);
 
     return 0;
+
 }

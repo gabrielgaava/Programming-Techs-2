@@ -64,7 +64,7 @@ Elem * createRingBuffer(int size){
 }
 
 
-// Le, printa e conta todos os nós da lista
+// Le, printa e conta todos os nós do buffer
 void printBuffer(Elem * writerPointer, Elem * readPointer){
 
     Elem * currentNode = NULL;
@@ -78,9 +78,14 @@ void printBuffer(Elem * writerPointer, Elem * readPointer){
 
         printf("\n=========== BUFFER ===========\n\n");
 
+        // Percorre todos elementos até voltar ao "inicio" novamente
         do {
+            
+            // Exibie local do ponteiro de Escrita
             if(currentNode == writerPointer) printf("(W)");
+            // Exibie local do ponteiro de Leitura
             if(currentNode == readPointer) printf("(R)");
+
             printf("[%s, %d]-->", currentNode->pal, currentNode->urg);
             listSize++;
             currentNode = currentNode->prox;
@@ -118,7 +123,7 @@ Elem * insertData(char word[20], int urg, Elem * writePointer){
 }
 
 
-// Remove um registro do Buffer
+// "Remove" um registro do Buffer
 Elem * deleteData(Elem * readPointer, Elem * writePointer){
     
     // Escreve no arquivo
@@ -132,13 +137,15 @@ Elem * deleteData(Elem * readPointer, Elem * writePointer){
         int jumpValue = readPointer->urg;
         readPointer->urg = -1;
 
-        printf("> Pulous [%d] posicoes\n", jumpValue);
-
+        // Neste caso pulamo URG posições POSSIVEIS. 
+        // Visto que nao pode ultrapassar o ponteiro de escrita
         for(int i = 0; i < jumpValue; i++){
         
             // Caso tenha chegado ao ultimo valor inserido
-            if(readPointer->prox == writePointer) {
+            if(readPointer == writePointer) {
                 i = jumpValue;
+
+            // Caso contrario, apenas pula uma posição
             } else {
                 readPointer = readPointer->prox;
             }
@@ -146,9 +153,11 @@ Elem * deleteData(Elem * readPointer, Elem * writePointer){
         
     } else {
         
+        // "Limpamos" o dado no Buffer 
         strcpy(readPointer->pal, "\0");
         readPointer->urg = -1;
 
+        // Não permitir ultrapassar o ponteiro de escrita
         if(readPointer->prox != writePointer)
             readPointer = readPointer->prox;
 
@@ -175,19 +184,19 @@ void readFileEntries(){
     // Leitura até o fim do arquivo
     while(fscanf(inputFile, "%d %s %d\n", &intA, string, &intB) == 3){
 
+        // Caso seja uma "inserção"
         if(intA == 0) {
 
-            // TODO: Verificar se a palavra é NULL, caso seja, finalizar o programa
+            // Caso a leitura seja 'NULL' finalizamos o programa
             if(strcmp(string, "NULL") == 0) break;
 
             writePointer = insertData(string, intB, writePointer);
-            printBuffer(writePointer, readPointer);
             fileEntries++;
         }
 
+        // Caso seja uma "remoção"
         else if (intA == 1){
             readPointer = deleteData(readPointer, writePointer);
-            printBuffer(writePointer, readPointer);
             readedEntries++;
         }
 
@@ -210,6 +219,7 @@ void readFileEntries(){
 int main(int argc, char const *argv[])
 {
 
+    // Cria o buffer circular
     Buffer = createRingBuffer(BUFFER_SIZE);
 
     // Arquivos que serão utilizados
@@ -222,8 +232,10 @@ int main(int argc, char const *argv[])
         return 0;
     }
 
+    // Faz a leitura de entrada e inicia o algoritimo do buffer
     readFileEntries();
 
+    // Fecha todos arquivos
     fclose(outputFile);
     fclose(inputFile);
 

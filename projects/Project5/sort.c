@@ -13,9 +13,7 @@ void printVector(float array[], int size){
 }
 
 // Insertion Sort Implementations - GeeksForGeeks.org
-void InsertionSort(float array[], int size){
-
-    printf("\n> Aplicando InsertionSort ...\n");
+void InsertionSort(float array[], int size){    
 
     int i, key, j;
 
@@ -37,8 +35,6 @@ void InsertionSort(float array[], int size){
 
 // Shell Sort Implementations - Wikipedia.org
 void ShellSort(float array[], int size){
-
-    printf("\n> Aplicando ShellSort ...\n");
 
     int i, j, value;
     int h = 1;
@@ -105,6 +101,35 @@ void QuickSort(float array[], int low, int high){
 
         QuickSort(array, low, pi - 1);
         QuickSort(array, pi+1, high);
+
+    }
+
+}
+
+// Linear Search Implementation
+int LinearSearch(float array[], float findingValue, int size){
+
+    for(int i = 0; i < size; i++){
+        if(array[i] == findingValue) return i;
+    }
+
+    return -1;
+
+}
+
+// Binary Search Implemantation with Recursion
+int BinarySearch(float array[], float findingValue, int low, int high){
+
+    int mid = (low + high) / 2;
+
+    if(array[mid] == findingValue) return mid;
+
+    if(low >= high) return -1;
+
+    else {
+
+        if(array[mid] < findingValue) return BinarySearch(array, findingValue, mid+1, high);
+        else return BinarySearch(array, findingValue, low, mid-1);
 
     }
 

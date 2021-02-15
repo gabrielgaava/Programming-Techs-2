@@ -16,4 +16,10 @@ void ShellSort(float array[], int size);
 /* Quick Sort Implementations - GeeksForGeeks.org */
 void QuickSort(float array[], int low, int high);
 
+/* Return the indice if it finds, or -1 if not */
+int LinearSearch(float array[], float findingValue, int size);
+
+/* Return the indice if it finds, or -1 if not */
+int BinarySearch(float array[], float findingValue, int low, int high);
+
 #endif

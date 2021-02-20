@@ -30,7 +30,7 @@ typedef struct data {
 // Read the vetor.dat file and create the vector dynamically
 float * readEntryFile(){
 
-    printf("\n> Reading 'vetor.dat' file...\n");
+    printf("\n> Lendo arquivo de entrada...\n");
 
     FILE * input = fopen("./test/teste02/vetor.dat", "r");
     float * array = malloc(1 * sizeof(float));
@@ -53,11 +53,9 @@ float * readEntryFile(){
 // Read the "busca.data" file and apply the search method
 void * readSearchFile(float array[], int arraySize, int applyBinary){
 
-    FILE * input = fopen("./test/teste01/busca.dat", "r");
-    FILE * output = fopen("./test/teste01/resultado2.dat", "w+");
+    FILE * input = fopen("./test/teste02/busca.dat", "r");
+    FILE * output = fopen("./test/teste02/resultado2.dat", "w+");
     float value, finalValue; int tempIndex; searchCount = 0;
-
-    printf("\n> Abrindo arquivo de busca ...");
 
     // Read and search elements of file
     while (fscanf(input, "%f\n", &value) != EOF){
@@ -86,10 +84,8 @@ int printMenu(){
 
     while(!validOption){
 
-        printf("\n = = = = = = = = = = =   M E N U   = = = = = = = = = = =");
-        printf("\n\n> Arquivo lido corretamente");
-        printf("\n> Quantidade de elementos armazenados: %d\n", entryCount);
-        printf("\n[1] - Busca sem ordenacao");
+        printf("\n= = = = = = = = = = =   M E N U   = = = = = = = = = = =");
+        printf("\n\n[1] - Busca sem ordenacao");
         printf("\n[2] - Ordenacao por InsertionSort e busca Sequencial");
         printf("\n[3] - Ordenacao por ShellSort e busca Sequencial");
         printf("\n[4] - Ordenacao por QuickSort e busca Sequencial");
@@ -97,7 +93,7 @@ int printMenu(){
         printf("\n[6] - Ordenacao por ShellSort e busca Binaria");
         printf("\n[7] - Ordenacao por QuickSort e busca Binaria");
         printf("\n[8] - Sair\n");
-        printf("\n = = = = = = = = = = = = = = = = = = = = = = = = = = = =");
+        printf("\n= = = = = = = = = = = = = = = = = = = = = = = = = = = =");
         printf("\n\nSUA ESCOLHA: ");
         scanf("%d", &option);
 
@@ -114,7 +110,7 @@ int printMenu(){
 
 // This function is responsible for execute the sort algorithm according 
 // to the option chosen in the menu
-Report handleSort(int option, float array[]){
+Report handleSort(int option){
 
     // For time calculation
     struct timespec sortStart, sortEnd;
@@ -122,6 +118,10 @@ Report handleSort(int option, float array[]){
     Report newReport;
 
     system("clear");
+
+    // Creating array from input file
+    float * array = readEntryFile();
+
     printf("\n> Iniciando ...");
 
     switch (option){
@@ -250,8 +250,6 @@ Report handleSort(int option, float array[]){
 int main(int argc, char const *argv[])
 {
 
-    // Creating array from input file
-    float * array = readEntryFile();
     int option;
     char key;
     Report results;
@@ -261,7 +259,7 @@ int main(int argc, char const *argv[])
     do {
         
         option = printMenu();
-        results = handleSort(option, array);
+        results = handleSort(option);
 
         if(option != 8 && option != 1){
 

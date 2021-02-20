@@ -110,7 +110,7 @@ void QuickSort(float array[], int low, int high){
 int LinearSearch(float array[], float findingValue, int size){
 
     for(int i = 0; i < size; i++){
-        if(array[i] == findingValue) return i;
+        if(abs(findingValue - array[i])  < 0.0001) return i;
     }
 
     return -1;
@@ -122,7 +122,7 @@ int BinarySearch(float array[], float findingValue, int low, int high){
 
     int mid = (low + high) / 2;
 
-    if(array[mid] == findingValue) return mid;
+    if(abs(findingValue - array[mid]) < 0.0001) return mid;
 
     if(low >= high) return -1;
 

@@ -65,45 +65,37 @@ void ShellSort(float array[], int size){
 
 }
 
-// Swap the value of two array positions
-void QuickSwap(float * a, float * b){
-    int t = *a;
-    *a = *b;
-    *b = t;
-}
+/* Quick Sort Implementations - Wikipedia.org */
+void QuickSort(float array[], int began, int end){
 
-/* This function takes last element as pivot, places the pivot element at
- its correct position in sorted array, and places all smaller (smaller than pivot) 
-to left of pivot and all greater elements to right of pivot */
-int QuickPartition(float array[], int low, int high){
+	int i = began;
+    int j = end-1;
+    int aux;
+    float pivo = array[(began + end) / 2];
 
-    int pivot = array[high];
-    int i = (low - 1);
+	while(i <= j)
+	{
+		while(array[i] < pivo && i < end)
+		{
+			i++;
+		}
 
-    for(int j = low; j <= high - 1; j++){
-        if(array[j] < pivot){
-            i++;
-            QuickSwap(&array[i], &array[j]);
-        }
-    }
-
-    QuickSwap(&array[i + 1], &array[high]);
-    return (i + 1);
-
-}
-
-// Quick Sort Implementations - GeeksForGeeks.org
-void QuickSort(float array[], int low, int high){
-
-    if(low < high){
-
-        int pi = QuickPartition(array, low, high);
-
-        QuickSort(array, low, pi - 1);
-        QuickSort(array, pi+1, high);
-
-    }
-
+		while(array[j] > pivo && j > began)
+		{
+			j--;
+		}
+		if(i <= j)
+		{
+			aux = array[i];
+			array[i] = array[j];
+			array[j] = aux;
+			i++;
+			j--;
+		}
+	}
+    
+	if(j > began) QuickSort(array, began, j+1);
+	if(i < end) QuickSort(array, i, end);
 }
 
 // Linear Search Implementation

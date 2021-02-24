@@ -13,8 +13,8 @@ void InsertionSort(float array[], int size);
 // Shell Sort Implementations - Wikipedia.org
 void ShellSort(float array[], int size);
 
-/* Quick Sort Implementations - GeeksForGeeks.org */
-void QuickSort(float array[], int low, int high);
+/* Quick Sort Implementations - Wikipedia.org */
+void QuickSort(float array[], int began, int end);
 
 /* Return the indice if it finds, or -1 if not */
 int LinearSearch(float array[], float findingValue, int size);

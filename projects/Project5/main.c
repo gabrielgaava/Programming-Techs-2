@@ -9,6 +9,8 @@
 
 // !! For development purpose only !!
 #define ARRAY_SIZE 10000
+#define NS_PER_SECOND 1000000000
+
 int entryCount = 0;
 int searchCount = 0;
 
@@ -32,7 +34,7 @@ float * readEntryFile(){
 
     printf("\n> Lendo arquivo de entrada...\n");
 
-    FILE * input = fopen("./test/teste02/vetor.dat", "r");
+    FILE * input = fopen("./test/teste04/vetor.dat", "r");
     float * array = malloc(1 * sizeof(float));
     float value;
     entryCount = 0;
@@ -53,8 +55,8 @@ float * readEntryFile(){
 // Read the "busca.data" file and apply the search method
 void * readSearchFile(float array[], int arraySize, int applyBinary){
 
-    FILE * input = fopen("./test/teste02/busca.dat", "r");
-    FILE * output = fopen("./test/teste02/resultado2.dat", "w+");
+    FILE * input = fopen("./test/teste04/busca.dat", "r");
+    FILE * output = fopen("./test/teste04/resultado2.dat", "w+");
     float value, finalValue; int tempIndex; searchCount = 0;
 
     // Read and search elements of file
@@ -73,6 +75,8 @@ void * readSearchFile(float array[], int arraySize, int applyBinary){
     fclose(input);
     fclose(output);
 
+    return;
+
 }
 
 // Print de Terminal Menu 
@@ -85,19 +89,20 @@ int printMenu(){
     while(!validOption){
 
         printf("\n= = = = = = = = = = =   M E N U   = = = = = = = = = = =");
-        printf("\n\n[1] - Busca sem ordenacao");
-        printf("\n[2] - Ordenacao por InsertionSort e busca Sequencial");
-        printf("\n[3] - Ordenacao por ShellSort e busca Sequencial");
-        printf("\n[4] - Ordenacao por QuickSort e busca Sequencial");
-        printf("\n[5] - Ordenacao por InsertionSort e busca Binaria");
-        printf("\n[6] - Ordenacao por ShellSort e busca Binaria");
-        printf("\n[7] - Ordenacao por QuickSort e busca Binaria");
-        printf("\n[8] - Sair\n");
+        printf("\n\n[1] - Busca Sequencial sem ordenacao");
+        printf("\n[2] - Busca Binaria sem ordenacao");
+        printf("\n[3] - Ordenacao por InsertionSort e busca Sequencial");
+        printf("\n[4] - Ordenacao por ShellSort e busca Sequencial");
+        printf("\n[5] - Ordenacao por QuickSort e busca Sequencial");
+        printf("\n[6] - Ordenacao por InsertionSort e busca Binaria");
+        printf("\n[7] - Ordenacao por ShellSort e busca Binaria");
+        printf("\n[8] - Ordenacao por QuickSort e busca Binaria");
+        printf("\n[9] - Sair\n");
         printf("\n= = = = = = = = = = = = = = = = = = = = = = = = = = = =");
         printf("\n\nSUA ESCOLHA: ");
         scanf("%d", &option);
 
-        if(option != -1 && option > 0 && option <= 8) {
+        if(option != -1 && option > 0 && option <= 9) {
             validOption = 1;
         } else {
             printf("\n> Opcao invalida!");
@@ -108,6 +113,40 @@ int printMenu(){
     
 }
 
+// Recebe duas capturas de tempo e faz a subtração delas
+// e armazena em uma nova estrutura
+void subTimespec(struct timespec t1, struct timespec t2, struct timespec *td) {
+
+    td->tv_nsec = t2.tv_nsec - t1.tv_nsec;
+    td->tv_sec  = t2.tv_sec - t1.tv_sec;
+
+    if (td->tv_sec > 0 && td->tv_nsec < 0) {
+        td->tv_nsec += NS_PER_SECOND;
+        td->tv_sec--;
+    }
+
+    else if (td->tv_sec < 0 && td->tv_nsec > 0){
+        td->tv_nsec -= NS_PER_SECOND;
+        td->tv_sec++;
+    }
+
+}
+
+// Printa na tela o tempo de forma "foramtada"
+void printTime(long sec, long nano, int type){
+
+    long ms = nano / 1.0e6;
+
+    if(type == 0){
+
+        printf("%ld,", sec);
+        if(ms < 100) printf("0");
+        printf("%ld seg", ms);
+
+    } 
+
+}
+
 // This function is responsible for execute the sort algorithm according 
 // to the option chosen in the menu
 Report handleSort(int option){
@@ -115,6 +154,7 @@ Report handleSort(int option){
     // For time calculation
     struct timespec sortStart, sortEnd;
     struct timespec searchStart, searchEnd;
+    struct timespec finalSort, finalSearch;
     Report newReport;
 
     system("clear");
@@ -125,121 +165,151 @@ Report handleSort(int option){
     printf("\n> Iniciando ...");
 
     switch (option){
-    case 1:
-        /* code */
-        break;
+        case 1: //8sec
+            printf("\n> Aplicando busca Sequencial ...");
+            printf("\n");
+            clock_gettime(CLOCK_REALTIME, &searchStart);
+            readSearchFile(array, entryCount, 0);
+            clock_gettime(CLOCK_REALTIME, &searchEnd);
+            strcpy(newReport.searchMethod, "Sequencial");
+            break;
 
-    case 2:
-        printf("\n> Aplicando InsertionSort ...");
-        clock_gettime(CLOCK_REALTIME, &sortStart);
-        InsertionSort(array, entryCount);
-        clock_gettime(CLOCK_REALTIME, &sortEnd);
+        case 2: //0sec
+            printf("\n> Aplicando busca Binaria ...");
+            printf("\n");
+            clock_gettime(CLOCK_REALTIME, &searchStart);
+            readSearchFile(array, entryCount, 1);
+            clock_gettime(CLOCK_REALTIME, &searchEnd);
+            strcpy(newReport.searchMethod, "Binaria");
+            break;
 
-        printf("\n> Aplicando busca Sequencial ...");
-        clock_gettime(CLOCK_REALTIME, &searchStart);
-        readSearchFile(array, entryCount, 0);
-        clock_gettime(CLOCK_REALTIME, &searchEnd);
+        case 3:
+            printf("\n> Aplicando InsertionSort ...");
+            printf("\n");
+            clock_gettime(CLOCK_REALTIME, &sortStart);
+            InsertionSort(array, entryCount);
+            clock_gettime(CLOCK_REALTIME, &sortEnd);
 
-        newReport.withSearch = 1;
-        strcpy(newReport.sortMethod, "InsertionSort");
-        strcpy(newReport.searchMethod, "Sequencial");
+            printf("> Aplicando busca Sequencial ...");
+            printf("\n");
+            clock_gettime(CLOCK_REALTIME, &searchStart);
+            readSearchFile(array, entryCount, 0);
+            clock_gettime(CLOCK_REALTIME, &searchEnd);
 
-        break;
+            newReport.withSearch = 1;
+            strcpy(newReport.sortMethod, "Insertion Sort");
+            strcpy(newReport.searchMethod, "Sequencial");
 
-    case 3:
-        printf("\n> Aplicando ShellSort ...");
-        clock_gettime(CLOCK_REALTIME, &sortStart);
-        ShellSort(array, entryCount);
-        clock_gettime(CLOCK_REALTIME, &sortEnd);
+            break;
 
-        printf("\n> Aplicando busca Sequencial ...");
-        clock_gettime(CLOCK_REALTIME, &searchStart);
-        readSearchFile(array, entryCount, 0);
-        clock_gettime(CLOCK_REALTIME, &searchEnd);
+        case 4:
+            printf("\n> Aplicando ShellSort ...");
+            printf("\n");
+            clock_gettime(CLOCK_REALTIME, &sortStart);
+            ShellSort(array, entryCount);
+            clock_gettime(CLOCK_REALTIME, &sortEnd);
 
-        newReport.withSearch = 1;
-        strcpy(newReport.sortMethod, "ShellSort");
-        strcpy(newReport.searchMethod, "Sequencial");
+            printf("> Aplicando busca Sequencial ...");
+            printf("\n");
+            clock_gettime(CLOCK_REALTIME, &searchStart);
+            readSearchFile(array, entryCount, 0);
+            clock_gettime(CLOCK_REALTIME, &searchEnd);
 
-        break;
-    
-    case 4:
-        printf("\n> Aplicando QuickSort ...");
-        clock_gettime(CLOCK_REALTIME, &sortStart);
-        QuickSort(array, 0, entryCount);
-        clock_gettime(CLOCK_REALTIME, &sortEnd);
+            newReport.withSearch = 1;
+            strcpy(newReport.sortMethod, "Shell Sort");
+            strcpy(newReport.searchMethod, "Sequencial");
 
-        printf("\n> Aplicando busca Sequencial ...");
-        clock_gettime(CLOCK_REALTIME, &searchStart);
-        readSearchFile(array, entryCount, 0);
-        clock_gettime(CLOCK_REALTIME, &searchEnd);
+            break;
+        
+        case 5:
+            printf("\n> Aplicando QuickSort ...");
+            printf("\n");
+            clock_gettime(CLOCK_REALTIME, &sortStart);
+            QuickSort(array, 0, entryCount);
+            clock_gettime(CLOCK_REALTIME, &sortEnd);
+            
+            printf("> Aplicando busca Sequencial ...");
+            printf("\n");
+            clock_gettime(CLOCK_REALTIME, &searchStart);
+            readSearchFile(array, entryCount, 0);
+            clock_gettime(CLOCK_REALTIME, &searchEnd);
 
-        newReport.withSearch = 1;
-        strcpy(newReport.sortMethod, "QuickSort");
-        strcpy(newReport.searchMethod, "Sequencial");
-        break;
-    
-    case 5:
-        printf("\n> Aplicando InsertionSort ...");
-        clock_gettime(CLOCK_REALTIME, &sortStart);
-        InsertionSort(array, entryCount);
-        clock_gettime(CLOCK_REALTIME, &sortEnd);
+            newReport.withSearch = 1;
+            strcpy(newReport.sortMethod, "Quick Sort");
+            strcpy(newReport.searchMethod, "Sequencial");
+            
+            break;
+        
+        case 6:
+            printf("\n> Aplicando InsertionSort ...");
+            printf("\n");
+            clock_gettime(CLOCK_REALTIME, &sortStart);
+            InsertionSort(array, entryCount);
+            clock_gettime(CLOCK_REALTIME, &sortEnd);
 
-        printf("\n> Aplicando busca Binaria ...");
-        clock_gettime(CLOCK_REALTIME, &searchStart);
-        readSearchFile(array, entryCount, 1);
-        clock_gettime(CLOCK_REALTIME, &searchEnd);
+            printf("> Aplicando busca Binaria ...");
+            printf("\n");
+            clock_gettime(CLOCK_REALTIME, &searchStart);
+            readSearchFile(array, entryCount, 1);
+            clock_gettime(CLOCK_REALTIME, &searchEnd);
 
-        newReport.withSearch = 1;
-        strcpy(newReport.sortMethod, "InsertionSort");
-        strcpy(newReport.searchMethod, "Binaria");
-        break;
+            newReport.withSearch = 1;
+            strcpy(newReport.sortMethod, "Insertion Sort");
+            strcpy(newReport.searchMethod, "Binaria");
+            break;
 
-    case 6:
-        printf("\n> Aplicando ShellSort ...");
-        clock_gettime(CLOCK_REALTIME, &sortStart);
-        ShellSort(array, entryCount);
-        clock_gettime(CLOCK_REALTIME, &sortEnd);
+        case 7:
+            printf("\n> Aplicando ShellSort ...");
+            printf("\n");
+            clock_gettime(CLOCK_REALTIME, &sortStart);
+            ShellSort(array, entryCount);
+            clock_gettime(CLOCK_REALTIME, &sortEnd);
 
-        printf("\n> Aplicando busca Binaria ...");
-        clock_gettime(CLOCK_REALTIME, &searchStart);
-        readSearchFile(array, entryCount, 1);
-        clock_gettime(CLOCK_REALTIME, &searchEnd);
+            printf("> Aplicando busca Binaria ...");
+            printf("\n");
+            clock_gettime(CLOCK_REALTIME, &searchStart);
+            readSearchFile(array, entryCount, 1);
+            clock_gettime(CLOCK_REALTIME, &searchEnd);
 
-        newReport.withSearch = 1;
-        strcpy(newReport.sortMethod, "ShellSort");
-        strcpy(newReport.searchMethod, "Binaria");
-        break;
+            newReport.withSearch = 1;
+            strcpy(newReport.sortMethod, "Shell Sort");
+            strcpy(newReport.searchMethod, "Binaria");
+            break;
 
-    case 7:
-        printf("\n> Aplicando QuickSort ...");
-        clock_gettime(CLOCK_REALTIME, &sortStart);
-        QuickSort(array, 0, entryCount);
-        clock_gettime(CLOCK_REALTIME, &sortEnd);
+        case 8:
+            printf("\n> Aplicando QuickSort ...");
+            printf("\n");
+            clock_gettime(CLOCK_REALTIME, &sortStart);
+            QuickSort(array, 0, entryCount);
+            clock_gettime(CLOCK_REALTIME, &sortEnd);
 
-        printf("\n> Aplicando busca Binaria ...");
-        clock_gettime(CLOCK_REALTIME, &searchStart);
-        readSearchFile(array, entryCount, 1);
-        clock_gettime(CLOCK_REALTIME, &searchEnd);
+            printf("> Aplicando busca Binaria ...");
+            printf("\n");
+            clock_gettime(CLOCK_REALTIME, &searchStart);
+            readSearchFile(array, entryCount, 1);
+            clock_gettime(CLOCK_REALTIME, &searchEnd);
 
-        newReport.withSearch = 1;
-        strcpy(newReport.sortMethod, "QuickSort");
-        strcpy(newReport.searchMethod, "Binaria");
-        break;
+            newReport.withSearch = 1;
+            strcpy(newReport.sortMethod, "Quick Sort");
+            strcpy(newReport.searchMethod, "Binaria");
+            break;
 
-    case 8:
-        return;
-        break;
-    
-    default:
-        break;
+        case 9:
+            return newReport;
+            break;
+        
+        default:
+            break;
     }
 
-    newReport.sortNanoTime = sortEnd.tv_nsec - sortStart.tv_nsec;
-    newReport.sortSegTime = sortEnd.tv_sec - sortStart.tv_sec;
+    subTimespec(sortStart, sortEnd, &finalSort);
+    subTimespec(searchStart, searchEnd, &finalSearch);
 
-    newReport.searchNanoTime = searchEnd.tv_nsec - searchStart.tv_nsec;
-    newReport.searchSegTime = searchEnd.tv_sec - searchStart.tv_sec;
+    newReport.sortNanoTime = finalSort.tv_nsec;
+    newReport.sortSegTime = finalSort.tv_sec;
+
+    newReport.searchNanoTime = finalSearch.tv_nsec;
+    newReport.searchSegTime = finalSearch.tv_sec;
 
 
     return newReport;
@@ -247,11 +317,9 @@ Report handleSort(int option){
 }
 
 // Primary function
-int main(int argc, char const *argv[])
-{
+int main(int argc, char const *argv[]) {
 
     int option;
-    char key;
     Report results;
 
     /* = = = MENU LOOP === */
@@ -261,22 +329,29 @@ int main(int argc, char const *argv[])
         option = printMenu();
         results = handleSort(option);
 
-        if(option != 8 && option != 1){
+        if(option != 9){
 
             system("clear");
             printf("\n = = = = = = =   R E S U L T A D O S   = = = = = = =\n");
-            printf("\n- ORDENACAO: ");
-            printf("\n> Elementos no vetor: %d elementos", entryCount);
-            printf("\n> Metodo de ordencao: %s", results.sortMethod);
-            printf("\n> Tempo de ordenacao: %ldns -> %ldseg", results.sortNanoTime, results.sortSegTime);
 
-            if(results.withSearch) {
-                printf("\n\n- BUSCA: ");
-                printf("\n> Metodo de busca: %s", results.searchMethod);
-                printf("\n> Tempo de busca: %ldns -> %ldseg", results.searchNanoTime, results.searchSegTime);
+            if(option > 2) {
+                printf("\n- ORDENACAO: ");
+                printf("\n> Elementos no vetor: %d elementos", entryCount);
+                printf("\n> Metodo de ordencao: %s", results.sortMethod);
+                printf("\n> Tempo de ordenacao: ");
+                printTime(results.sortSegTime, results.sortNanoTime, 0);
+                printf("\n");
             }
 
-            printf("\n\n> Tempo TOTAL: %ldns -> %ldseg", results.searchNanoTime + results.sortNanoTime, results.sortSegTime + results.searchSegTime);
+            printf("\n- BUSCA: ");
+            printf("\n> Metodo de busca: %s", results.searchMethod);
+            printf("\n> Tempo de busca: ");
+            printTime(results.searchSegTime, results.searchNanoTime, 0);
+            
+            if(option > 2) {
+                printf("\n\n> Tempo TOTAL: ");
+                printTime(results.sortSegTime + results.searchSegTime, results.searchNanoTime + results.sortNanoTime, 0);
+            }
 
             printf("\n\n= = = = = = = = = = = = = = = = = = = = = = = = = = =\n");
 
@@ -286,10 +361,10 @@ int main(int argc, char const *argv[])
 
         }
 
-    } while(option != 8);
+    } while(option != 9);
 
     /* = = = = = = = = = = */
 
-
+    printf("\n> Saindo... \n");
     return 0;
 }

@@ -147,6 +147,7 @@ Elem * deleteData(Elem * readPointer, Elem * writePointer){
 
             // Caso contrario, apenas pula uma posição
             } else {
+                //bufferCount--;
                 readPointer = readPointer->prox;
             }
         }

@@ -4,17 +4,16 @@
 #include <string.h>
 #include <ctype.h>
 
-// Header files from external source code
+// Cabeçalho para arquivo com algoritmos de ordenação
 #include "sort.h"
 
-// !! For development purpose only !!
-#define ARRAY_SIZE 10000
+// Defines
 #define NS_PER_SECOND 1000000000
 
 int entryCount = 0;
 int searchCount = 0;
 
-// Support struct to store de results
+// Estrutura de suporte para armazenar resultados
 typedef struct data {
     
     long sortNanoTime;
@@ -29,20 +28,20 @@ typedef struct data {
 
 } Report;
 
-// Read the vetor.dat file and create the vector dynamically
-float * readEntryFile(){
+// Le o arquivo vetor.dat e cria o vetor de forma dinamica
+double * readEntryFile(){
 
     printf("\n> Lendo arquivo de entrada...\n");
 
-    FILE * input = fopen("./test/teste04/vetor.dat", "r");
-    float * array = malloc(1 * sizeof(float));
-    float value;
+    FILE * input = fopen("./test/teste01/vetor.dat", "r");
+    double * array = malloc(1 * sizeof(double));
+    double value;
     entryCount = 0;
 
     // Read, create and store dynamically
-    while (fscanf(input, "%f\n", &value) != EOF){
+    while (fscanf(input, "%lf\n", &value) != EOF){
         entryCount++;
-        array = realloc(array, entryCount * sizeof(float));
+        array = realloc(array, entryCount * sizeof(double));
         array[entryCount - 1] = value;
     }
 
@@ -52,15 +51,15 @@ float * readEntryFile(){
     
 }
 
-// Read the "busca.data" file and apply the search method
-void * readSearchFile(float array[], int arraySize, int applyBinary){
+// Le o arquivo "busca.data" e aplica um metodo de busca para cada entrada
+void readSearchFile(double array[], int arraySize, int applyBinary){
 
-    FILE * input = fopen("./test/teste04/busca.dat", "r");
-    FILE * output = fopen("./test/teste04/resultado2.dat", "w+");
-    float value, finalValue; int tempIndex; searchCount = 0;
+    FILE * input = fopen("./test/teste01/busca.dat", "r");
+    FILE * output = fopen("./test/teste01/resultado2.dat", "w+");
+    double value, finalValue; int tempIndex; searchCount = 0;
 
     // Read and search elements of file
-    while (fscanf(input, "%f\n", &value) != EOF){
+    while (fscanf(input, "%lf\n", &value) != EOF){
 
         searchCount++;
         if(applyBinary) tempIndex = BinarySearch(array, value, 0, arraySize);
@@ -69,7 +68,7 @@ void * readSearchFile(float array[], int arraySize, int applyBinary){
         if(tempIndex == -1) finalValue = 0.0;
         else finalValue = array[tempIndex];
 
-        fprintf(output, "%d %f %f\n", tempIndex, finalValue, value);
+        fprintf(output, "%d %lf %lf\n", tempIndex, finalValue, value);
     }
 
     fclose(input);
@@ -79,11 +78,10 @@ void * readSearchFile(float array[], int arraySize, int applyBinary){
 
 }
 
-// Print de Terminal Menu 
+// Printa no terminal um Menu
 int printMenu(){
 
     int option = -1, validOption = 0;
-    char term;
     system("clear");
 
     while(!validOption){
@@ -137,21 +135,27 @@ void printTime(long sec, long nano, int type){
 
     long ms = nano / 1.0e6;
 
-    if(type == 0){
-
+    if(ms > 0){
+        if(ms > 1000) { 
+            sec = sec + 1;
+            ms = ms - 1000;
+        }
         printf("%ld,", sec);
         if(ms < 100) printf("0");
         printf("%ld seg", ms);
-
     } 
+    else {
+        printf("0,000%ld seg", nano);
+    }
+
 
 }
 
-// This function is responsible for execute the sort algorithm according 
-// to the option chosen in the menu
+// Função repsonsavel por lidar com a opção gerado no Menu
+// Inicia e finaliza os timers
 Report handleSort(int option){
 
-    // For time calculation
+    // Para calculo de tempo
     struct timespec sortStart, sortEnd;
     struct timespec searchStart, searchEnd;
     struct timespec finalSort, finalSearch;
@@ -159,22 +163,24 @@ Report handleSort(int option){
 
     system("clear");
 
-    // Creating array from input file
-    float * array = readEntryFile();
+    // Cria o vetor baseado no arquivo
+    // Para que na proxima iteração ele esteja DESORDENADO
+    double * array = readEntryFile();
 
     printf("\n> Iniciando ...");
 
     switch (option){
-        case 1: //8sec
+        case 1: 
             printf("\n> Aplicando busca Sequencial ...");
             printf("\n");
             clock_gettime(CLOCK_REALTIME, &searchStart);
             readSearchFile(array, entryCount, 0);
             clock_gettime(CLOCK_REALTIME, &searchEnd);
             strcpy(newReport.searchMethod, "Sequencial");
+            printVector(array, entryCount);
             break;
 
-        case 2: //0sec
+        case 2: 
             printf("\n> Aplicando busca Binaria ...");
             printf("\n");
             clock_gettime(CLOCK_REALTIME, &searchStart);
@@ -316,7 +322,7 @@ Report handleSort(int option){
 
 }
 
-// Primary function
+// Função Primaria
 int main(int argc, char const *argv[]) {
 
     int option;

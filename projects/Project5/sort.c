@@ -1,7 +1,8 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 /* Print the actual state of vector */
-void printVector(float array[], int size){
+void printVector(double array[], int size){
     
     for(int i = 0; i < size; i++){
         printf("[%f]", array[i]);
@@ -13,7 +14,7 @@ void printVector(float array[], int size){
 }
 
 // Insertion Sort Implementations - GeeksForGeeks.org
-void InsertionSort(float array[], int size){    
+void InsertionSort(double array[], int size){    
 
     int i, key, j;
 
@@ -34,7 +35,7 @@ void InsertionSort(float array[], int size){
 }
 
 // Shell Sort Implementations - Wikipedia.org
-void ShellSort(float array[], int size){
+void ShellSort(double array[], int size){
 
     int i, j, value;
     int h = 1;
@@ -66,12 +67,12 @@ void ShellSort(float array[], int size){
 }
 
 /* Quick Sort Implementations - Wikipedia.org */
-void QuickSort(float array[], int began, int end){
+void QuickSort(double array[], int began, int end){
 
 	int i = began;
     int j = end-1;
     int aux;
-    float pivo = array[(began + end) / 2];
+    double pivo = array[(began + end) / 2];
 
 	while(i <= j)
 	{
@@ -99,10 +100,14 @@ void QuickSort(float array[], int began, int end){
 }
 
 // Linear Search Implementation
-int LinearSearch(float array[], float findingValue, int size){
+int LinearSearch(double array[], double findingValue, int size){
 
+    // Percorre cada posição do vetor
     for(int i = 0; i < size; i++){
-        if(abs(findingValue - array[i])  < 0.0001) return i;
+        
+        // Modulo de (findingValue - array[i])
+        if(abs(findingValue - array[i])  < 0.0001) 
+            return i;
     }
 
     return -1;
@@ -110,18 +115,25 @@ int LinearSearch(float array[], float findingValue, int size){
 }
 
 // Binary Search Implemantation with Recursion
-int BinarySearch(float array[], float findingValue, int low, int high){
+int BinarySearch(double array[], double findingValue, int low, int high){
 
+    // Atualiza a metade
     int mid = (low + high) / 2;
 
+    // Modulo de (findingValue - array[i]) 
     if(abs(findingValue - array[mid]) < 0.0001) return mid;
 
+    // Não encontrado
     if(low >= high) return -1;
 
+    // Recursão
     else {
+        
+        if(array[mid] < findingValue) 
+            return BinarySearch(array, findingValue, mid+1, high);
 
-        if(array[mid] < findingValue) return BinarySearch(array, findingValue, mid+1, high);
-        else return BinarySearch(array, findingValue, low, mid-1);
+        else 
+            return BinarySearch(array, findingValue, low, mid-1);
 
     }
 

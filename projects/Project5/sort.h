@@ -5,21 +5,21 @@
 /* Prototypes for the functions */
 
 /* Print the actual state of vector */
-void printVector(float array[], int size);
+void printVector(double array[], int size);
 
 /* Insertion Sort Implementations - GeeksForGeeks.org */
-void InsertionSort(float array[], int size);
+void InsertionSort(double array[], int size);
 
 // Shell Sort Implementations - Wikipedia.org
-void ShellSort(float array[], int size);
+void ShellSort(double array[], int size);
 
 /* Quick Sort Implementations - Wikipedia.org */
-void QuickSort(float array[], int began, int end);
+void QuickSort(double array[], int began, int end);
 
 /* Return the indice if it finds, or -1 if not */
-int LinearSearch(float array[], float findingValue, int size);
+int LinearSearch(double array[], double findingValue, int size);
 
 /* Return the indice if it finds, or -1 if not */
-int BinarySearch(float array[], float findingValue, int low, int high);
+int BinarySearch(double array[], double findingValue, int low, int high);
 
 #endif

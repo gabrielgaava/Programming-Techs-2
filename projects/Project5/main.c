@@ -12,6 +12,7 @@
 
 int entryCount = 0;
 int searchCount = 0;
+int foundCount = 0;
 
 // Estrutura de suporte para armazenar resultados
 typedef struct data {
@@ -33,7 +34,7 @@ double * readEntryFile(){
 
     printf("\n> Lendo arquivo de entrada...\n");
 
-    FILE * input = fopen("./test/teste01/vetor.dat", "r");
+    FILE * input = fopen("./vetor.dat", "r");
     double * array = malloc(1 * sizeof(double));
     double value;
     entryCount = 0;
@@ -54,8 +55,8 @@ double * readEntryFile(){
 // Le o arquivo "busca.data" e aplica um metodo de busca para cada entrada
 void readSearchFile(double array[], int arraySize, int applyBinary){
 
-    FILE * input = fopen("./test/teste01/busca.dat", "r");
-    FILE * output = fopen("./test/teste01/resultado2.dat", "w+");
+    FILE * input = fopen("./busca.dat", "r");
+    FILE * output = fopen("./resultado.dat", "w+");
     double value, finalValue; int tempIndex; searchCount = 0;
 
     // Read and search elements of file
@@ -66,7 +67,11 @@ void readSearchFile(double array[], int arraySize, int applyBinary){
         else tempIndex = LinearSearch(array, value, arraySize);
 
         if(tempIndex == -1) finalValue = 0.0;
-        else finalValue = array[tempIndex];
+
+        else { 
+            finalValue = array[tempIndex]; 
+            foundCount++;
+        }
 
         fprintf(output, "%d %lf %lf\n", tempIndex, finalValue, value);
     }
@@ -160,6 +165,7 @@ Report handleSort(int option){
     struct timespec searchStart, searchEnd;
     struct timespec finalSort, finalSearch;
     Report newReport;
+    foundCount = 0;
 
     system("clear");
 
@@ -177,7 +183,6 @@ Report handleSort(int option){
             readSearchFile(array, entryCount, 0);
             clock_gettime(CLOCK_REALTIME, &searchEnd);
             strcpy(newReport.searchMethod, "Sequencial");
-            printVector(array, entryCount);
             break;
 
         case 2: 
@@ -351,6 +356,7 @@ int main(int argc, char const *argv[]) {
 
             printf("\n- BUSCA: ");
             printf("\n> Metodo de busca: %s", results.searchMethod);
+            printf("\n> Elementos encontrados: %d", foundCount);
             printf("\n> Tempo de busca: ");
             printTime(results.searchSegTime, results.searchNanoTime, 0);
             

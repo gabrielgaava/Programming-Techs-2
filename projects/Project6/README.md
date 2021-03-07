@@ -1,7 +1,7 @@
 # Projeto 6 - MergeSort com Thread
-### Gustavo Henrique de Oliveira Villar
+### Gabriel Henrique da Silva Gava
 
-## **1. Enunciado:**
+## **1. Objetivo:**
 <p>
 Implemente o método de merge sort usando threads paralelas. Em seu projeto considere que o vetor será dividido em no máximo DEZESSEIS partes. Com isso é necessário aplicar um método de ordenação clássico em cada uma dessas partes, antes de iniciar as operações de merge.
 
@@ -12,7 +12,7 @@ Entrega: 08/03, no classroom
 </p>
 
 ## **2. Compilação:**
-Para compilar o programa basta exucutar o seguinte comando no terminal nesta pasta:
+Para compilar basta exucutar o seguinte comando no terminal:
 
 ```
 gcc -pthread -o main main.c
@@ -22,3 +22,6 @@ E para executar
 ```
 ./main
 ```
+
+## **3. Observações**
+O array ordenado se encontra em um arquivo chamado array.dat. O tempo de escrita deste arquivo não foi considerado pra contagem de tempo da ordenação.

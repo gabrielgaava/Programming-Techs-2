@@ -1,198 +1,253 @@
-// Importing Libraries
+// Gabriel Henrique da Silva Gava
+
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <pthread.h>
 #include <time.h>
 #include <sys/time.h>
 
-// Global Variables
-#define INPUT_SIZE 500000
+// Valores Globais
 double *array;
-int size = 0;
-int NUM_THREADS;
-int NUMBERS_PER_THREAD;
+int ARRAY_SIZE;
+int NUM_OF_THREADS;
+int NUMBER_PER_THREAD;
 int OFFSET;
 
-
-// Time Structures
-struct timespec initialSortTime, finalSortTime;
-struct timespec initialSearchTime, finalSearchTime;
-
-struct timeRegistry {
+// Estrutura responsavel por armazenas os registros
+// de tempo da aplicação
+typedef struct timeRecord {
   long int seconds;
   long int nanoseconds;
-};
+} TimeRecord;
 
-struct timeRegistry sortRegistry;
-struct timeRegistry searchRegistry;
+// Calcula o tempo de execução dado um inicio e um fim
+TimeRecord getRecordTime(struct timespec start, struct timespec end){
+  TimeRecord record;
 
-struct timeRegistry getTimeRegistry(struct timespec initial, struct timespec final) {
-  struct timeRegistry registry;
-
-  if (final.tv_nsec < initial.tv_nsec) {
-    final.tv_nsec += 1000000000;
-    final.tv_sec--;
+  if(end.tv_sec < start.tv_sec){
+    end.tv_nsec += 1000000000;
+    end.tv_sec--;
   }
 
-  registry.seconds = (long)(final.tv_sec - initial.tv_sec);
-  registry.nanoseconds = final.tv_nsec - initial.tv_nsec;
+  record.seconds = (long)(end.tv_sec - start.tv_sec);
+  record.nanoseconds = (long)(end.tv_nsec - start.tv_nsec);
 
-  return registry;
+  return record;
 }
 
-// Print the sorting time
-void printSortTime() {
-  sortRegistry = getTimeRegistry (initialSortTime, finalSortTime);
-  printf("Tempo de ordenação: %ld.%09ld\n", sortRegistry.seconds, sortRegistry.nanoseconds);
-
+// Printa o tempo
+void printTime(struct timespec S_SortTime, struct timespec E_SortTime) {
+  TimeRecord timeRecord = getRecordTime(S_SortTime, E_SortTime);
+  printf("%ld.%09ld", timeRecord.seconds, timeRecord.nanoseconds);
 }
 
-// Read Input Array
-void *getInputArray() {
-  FILE *input = fopen("./vetor120k.dat", "r");
+// Cria array de double de acordo com o arquivo escolhido
+double * allocateArray(char fileName[]){
 
-  array = (double *) malloc(INPUT_SIZE * sizeof(double));
+    printf("\n> Lendo arquivo de entrada '%s'..\n", fileName);
 
-  while(fscanf(input, "%lf", &array[size]) != EOF) size++;
+    FILE * input = fopen(fileName, "r");
+    double * array = malloc(1 * sizeof(double));
+    double value;
+    ARRAY_SIZE = 0;
 
-  fclose(input);
+    // Read, create and store dynamically
+    while (fscanf(input, "%lf\n", &value) != EOF){
+        ARRAY_SIZE++;
+        array = realloc(array, ARRAY_SIZE * sizeof(double));
+        array[ARRAY_SIZE - 1] = value;
+    }
+
+    printf("> [%d] Entradas armazenadas\n", ARRAY_SIZE);
+    fclose(input);
+    return array;
+    
 }
 
-// Print Array
-void printArray() {
-  int i = 0;
-
-  for (i = 0; i < size; i++) {
+// <-- !! Apenas para desenvolvimento !! -->
+// Imprime no terminal o array
+void printArray(int start, int end) {
+  for (int i = start; i < end; i++) {
     printf("%lf\n", array[i]);
   }
 }
 
-/* merge function */
-int merge(int left, int middle, int right) {
-    int i = 0;
-    int j = 0;
-    int k = 0;
-    int left_length = middle - left + 1;
-    int right_length = right - middle;
-    int left_array[left_length];
-    int right_array[right_length];
-    
-    /* copy values to left array */
-    for (int i = 0; i < left_length; i ++) {
-        left_array[i] = array[left + i];
-    }
-    
-    /* copy values to right array */
-    for (int j = 0; j < right_length; j ++) {
-        right_array[j] = array[middle + 1 + j];
-    }
-    
-    i = 0;
-    j = 0;
-    /** chose from right and left arrays and copy */
-    while (i < left_length && j < right_length) {
-        if (left_array[i] <= right_array[j]) {
-            array[left + k] = left_array[i];
-            i ++;
-        } else {
-            array[left + k] = right_array[j];
-            j ++;
-        }
-        k ++;
-    }
-    
-    /* copy the remaining values to the array */
-    while (i < left_length) {
+// <-- !! Apenas para desenvolvimento !! -->
+// Imprime o array em um arquivo
+void createArrayFile(){
+  FILE * Output = fopen("./array.dat", "w+");
+  for (int i = 0; i < ARRAY_SIZE; i++) {
+    fprintf(Output,"%lf\n", array[i]);
+  }
+}
+
+// Função "merge" do MergeSort
+int Merge(int left, int middle, int right) {
+  int i = 0, j = 0, k = 0;
+  int left_length = middle - left + 1;
+  int right_length = right - middle;
+  double left_array[left_length];
+  double right_array[right_length];
+
+  // Copia os valores para o array da esquerda 
+  for (int i = 0; i < left_length; i ++) {
+    left_array[i] = array[left + i];
+  }
+
+// Copia os valores para o array da direita 
+  for (int j = 0; j < right_length; j ++) {
+    right_array[j] = array[middle + 1 + j];
+  }
+
+  i = j = 0;
+
+  // Escolhe da esquerda e rireita e copia
+  while (i < left_length && j < right_length) {
+    if (left_array[i] <= right_array[j]) {
         array[left + k] = left_array[i];
-        k ++;
         i ++;
-    }
-    while (j < right_length) {
+    } else {
         array[left + k] = right_array[j];
-        k ++;
         j ++;
     }
+    k ++; 
+  }
 
-    return 0;
+  // Copia os valores remanescente para o array
+  while (i < left_length) {
+      array[left + k] = left_array[i];
+      k ++;
+      i ++;
+  }
+  while (j < right_length) {
+      array[left + k] = right_array[j];
+      k ++;
+      j ++;
+  }
+
+  return 0;
+
 }
 
-// Merge Sort
-void merge_sort(int left, int right) {
-    if (left < right) {
-        int middle = left + (right - left) / 2;
-        merge_sort(left, middle);
-        merge_sort(middle + 1, right);
-        merge(left, middle, right);
-    }
+// Algoritmo de ordenação MergeSort
+void MergeSort(int left, int right) {
+  if (left < right) {
+      int middle = left + (right - left) / 2;
+      MergeSort(left, middle);
+      MergeSort(middle + 1, right);
+      Merge(left, middle, right);
+  }
 }
 
-void *thread_merge_sort(void* arg) {
-    int thread_id = (long)arg;
-    int left = thread_id * (NUMBERS_PER_THREAD);
-    int right = (thread_id + 1 ) * (NUMBERS_PER_THREAD) - 1;
-    if (thread_id == NUM_THREADS - 1) {
-        right += OFFSET;
-    }
-    int middle = left + (right - left) / 2;
-    if (left < right) {
-        merge_sort(left, right);
-        merge_sort(left + 1, right);
-        merge(left, middle, right);
-    }
-    return NULL;
+// Função executada pelos threads
+void * Threads_MergeSort(void * arg){
+  int threadID = (long)arg;
+  int left = threadID * (NUMBER_PER_THREAD);
+  int right = (threadID + 1) * (NUMBER_PER_THREAD) - 1;
+
+  if(threadID == NUM_OF_THREADS - 1) right += OFFSET;
+
+  int middle = left + (right - left)/2;
+
+  if(left < right) {
+    MergeSort(left, right);
+    MergeSort(left+1, right);
+    Merge(left, middle, right);
+  }
+
+  printf("\n|> Thread %d ordenou intervalo [%d, %d]: ",threadID, left, right);
+  //printArray(left, right);
+
+  return NULL;
 }
 
-void merge_sections_of_array(int number, int aggregation) {
-    for(int i = 0; i < number; i = i + 2) {
-        int left = i * (NUMBERS_PER_THREAD * aggregation);
-        int right = ((i + 2) * NUMBERS_PER_THREAD * aggregation) - 1;
-        int middle = left + (NUMBERS_PER_THREAD * aggregation) - 1;
-        if (right >= size) {
-            right = size - 1;
+// Junsta as partes do array
+void MergeSections(int number, int aggr){
+  for(int i = 0; i < number; i = i + 2) {
+        int left = i * (NUMBER_PER_THREAD * aggr);
+        int right = ((i + 2) * NUMBER_PER_THREAD * aggr) - 1;
+        int middle = left + (NUMBER_PER_THREAD * aggr) - 1;
+        if (right >= ARRAY_SIZE) {
+            right = ARRAY_SIZE - 1;
         }
-        merge(left, middle, right);
+        Merge(left, middle, right);
     }
     if (number / 2 >= 1) {
-        merge_sections_of_array(number / 2, aggregation * 2);
+        MergeSections(number / 2, aggr * 2);
     }
 }
 
-// Main function
-int main(int argc, char const *argv[])
-{
-    getInputArray();
+// Função principal
+int main(int argc, char const *argv[]){
 
-    printf("Digite a quantidade de Threads: ");
-    scanf("%d", &NUM_THREADS);
-    NUMBERS_PER_THREAD = size / NUM_THREADS;
-    OFFSET = size % NUM_THREADS;
+  int arraySizeOption;
+  char fileName[100];
+  struct timespec S_SortTime, E_SortTime;
+  
+  printf("\n|= = = = = = =  M E N U  = = = = = = =|");
+  printf("\n|> Selecione o tamanho do array:");
+  printf("\n\n[1] 120.000 Elementos");
+  printf("\n[2] 240.000 Elementos");
+  printf("\n[3] 480.000 Elementos");
 
-    puts("------------------------------------------------------------------------");
-    pthread_t threads[NUM_THREADS];
-    clock_gettime(CLOCK_REALTIME, &initialSortTime);
-    long i;
+  printf("\n\nSua escolha: ");
+  scanf("%d", &arraySizeOption);
 
-    // Creating Threads
-    for(long i = 0; i < NUM_THREADS; i++) {
-        int rc = pthread_create(&threads[i], NULL, thread_merge_sort, (void *)i);
-        if (rc){
-            printf("Error");
-            exit(-1);
-        }
-    }
-
-    for( i = 0; i < NUM_THREADS; i++) {
-        pthread_join(threads[i], NULL);
-    }
-
-    merge_sections_of_array(NUM_THREADS, 1);
-
-
-
-    clock_gettime(CLOCK_REALTIME, &finalSortTime);
-
-    printArray();
-    printSortTime();
-
+  // Handle File
+  if(arraySizeOption == 1) strcpy(fileName, "vetor120k.dat");
+  else if(arraySizeOption == 2) strcpy(fileName, "vetor240k.dat");
+  else if(arraySizeOption == 3) strcpy(fileName, "vetor480k.dat");
+  else {
+    printf("\nOpção invalida. Programa encerrado!\n");
     return 0;
+  }
+
+  printf("\n\n|> Informe a quantidade de Threads (1, 2, 4 ou 8):");
+  printf("\nSua escolha: ");
+  scanf("%d", &NUM_OF_THREADS);
+
+  if(NUM_OF_THREADS > 8 || NUM_OF_THREADS < 1 
+  || NUM_OF_THREADS == 3 || NUM_OF_THREADS == 5 
+  || NUM_OF_THREADS == 6 || NUM_OF_THREADS == 7) {
+    printf("\n|> Numero de threads invalido!\n");
+    return 0;
+  }
+
+  system("clear");
+
+  array = allocateArray(fileName);
+  NUMBER_PER_THREAD = ARRAY_SIZE / NUM_OF_THREADS;
+  OFFSET = ARRAY_SIZE % NUM_OF_THREADS;
+
+  // Iniciando Lógica dos Threads
+  pthread_t threads[NUM_OF_THREADS];
+  clock_gettime(CLOCK_REALTIME, &S_SortTime);
+  long i;
+
+  // Cria todos os Threads
+  for(i = 0; i < NUM_OF_THREADS; i++){
+    int rc = pthread_create(&threads[i], NULL, Threads_MergeSort, (void *)i);
+    if(rc) {
+      printf("\n> Erro criação de Threads!");
+      return 0;
+    }
+  }
+
+  // Espera todos Threads terminarem
+  for(i = 0; i < NUM_OF_THREADS; i++){
+    pthread_join(threads[i], NULL);
+  }
+  
+  // Agrupa os resultados
+  MergeSections(NUM_OF_THREADS, 1);
+
+  clock_gettime(CLOCK_REALTIME, &E_SortTime);
+  printf("\n|> Tempo levado para ordenacao: ");
+  printTime(S_SortTime, E_SortTime);
+  printf("\n");
+
+  createArrayFile();
+
+  return 0;
 }

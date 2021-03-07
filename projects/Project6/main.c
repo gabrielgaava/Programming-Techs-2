@@ -190,6 +190,8 @@ int main(int argc, char const *argv[])
 
 
     clock_gettime(CLOCK_REALTIME, &finalSortTime);
+
+    printArray();
     printSortTime();
 
     return 0;
